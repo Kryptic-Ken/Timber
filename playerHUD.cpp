@@ -118,4 +118,7 @@ void HUD::draw(RenderWindow& window)
     {
         window.draw(messageText);
     }
+        
+    //Displays what has been drawn
+    window.display();
 }
