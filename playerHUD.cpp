@@ -11,7 +11,9 @@ playerTimeRemaining(playerTimeRemaining),
 PlayerDied(PlayerDied),
 timeBarWidthPerSecond(60)
 {
-    font.loadFromFile("Resources/Fonts/KOMIKAP_.ttf");
+    //Check the file for the correct font
+    //Could not load file for the correct font of displayed text
+    font.loadFromFile();
 
     // Set the font to our message
     messageText.setFont(font);
