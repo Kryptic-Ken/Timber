@@ -3,9 +3,9 @@
 #include <sstream>
 
 
-HUD::HUD(bool* pausedGame, int* playerScore, float* playerTimeRemaining, bool* PlayerDied):
+HUD::HUD(bool* paused, int* playerScore, float* playerTimeRemaining, bool* PlayerDied):
 Object(),
-pausedGame(pausedGame),
+paused(paused),
 playerScore(playerScore),
 playerTimeRemaining(playerTimeRemaining),
 PlayerDied(PlayerDied),
@@ -90,7 +90,7 @@ void HUD::update(RenderWindow& window, Time timedelta)
 {
     updatePlayerTimeRemaining(*playerTimeRemaining);
 
-    if (pausedGame && (*pausedGame))
+    if (paused && (*paused))
     {
         if (playerTimeRemaining && (*playerTimeRemaining <= 0.0f))
             setMessageText("Out of time!!");
@@ -115,7 +115,7 @@ void HUD::draw(RenderWindow& window)
     // Display messages on the screen
     window.draw(scoreTextBackground);
     window.draw(scoreText);
-    if (pIsPaused && (*pIsPaused))
+    if (paused && (*paused)
     {
         window.draw(messageText);
     }
