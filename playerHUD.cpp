@@ -106,7 +106,6 @@ void HUD::update(RenderWindow& window, Time timedelta)
     }
 }
 
-
 void HUD::draw(RenderWindow& window)
 {
     // Draw the timebar
