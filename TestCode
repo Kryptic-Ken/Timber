@@ -217,7 +217,34 @@ int main()
 
 	//Variables to control time itself
 	Clock clock;
+	
+	bool paused = true;
+	int playerScore = 0;
+	float playerTimeRemaining = 6.0f;
+	bool PlayerDied = false;
+	
+	HUD hud(paused, playerScore, playerTimeRemaining, PlayerDied);
 
+	
+	
+	
+	if (!paused)
+        {
+            // Time elapsed after previous frame
+            Time timedelta = clock.restart();
+
+            // Subtract from the amount of time remaining
+            playerTimeRemaining -= timedelta.asSeconds();
+
+            if (timeRemaining <= 0.0f)
+            {
+                // Pause the game
+                paused = true;
+            }
+	    
+	    
+	    
+	    
 	//Track whether the game is running
 	bool paused = true;
 	//while the window is open it will execute all the code inside.
