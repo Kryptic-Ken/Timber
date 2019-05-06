@@ -294,7 +294,7 @@ int main()
 			srand((int)time(0) * 100);
 			cloud2Speed = (rand() % 200);
 
-			//how high is the cloud
+			//how high is the cloud 
 			srand((int)time(0) * 10);
 			float height = (rand() % 150);
 			spriteCloud2.setPosition(-200, height);
