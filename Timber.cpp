@@ -1,6 +1,8 @@
+//All of the important header Files
 #include "pch.h"
 #include <iostream>
 //#include "stdafx.h"
+#include <sstream>
 #include <SFML/Graphics.hpp>
 
 using namespace sf;
@@ -71,54 +73,47 @@ int main()
 	//Variables to control time itself
 	Clock clock;
 
+	// Time bar
 	RectangleShape timeBar;
-
 	float timeBarStartWidth = 400;
 	float timeBarHeight = 80;
-	
 	timeBar.setSize(Vector2f(timeBarStartWidth, timeBarHeight));
 	timeBar.setFillColor(Color::Red);
 	timeBar.setPosition((1920 / 2) - timeBarStartWidth / 2, 980);
 
 	Time gameTimeTotal;
 	float timeRemaining = 6.0f;
-	float timeBarWidthPerSecond = timeBarStartWidth / (timeRemaining);
+	float timeBarWidthPerSecond = timeBarStartWidth / timeRemaining;
+
 	//Track whether the game is running
 	bool paused = true;
 
-	//Draw some text
+	// Draw some text
 	int score = 0;
 
 	sf::Text messageText;
 	sf::Text scoreText;
-
-	//We need to chose a font
-	Font font;
-	font.loadFromFile("fonts/KOMIKAP_.tff");
-
-	// Set the font to our message
-	messageText.setFont(font);
+	// We need to choose a font 
+	Font font; 
+	font.loadFromFile("fonts/KOMIKAP_.ttf");
+	// Set the font to our message 
+	messageText.setFont(font); 
 	scoreText.setFont(font);
-
-	// Assign the actual message
-	messageText.setString("Press Enter to start!");
+	// Assign the actual message 
+	messageText.setString("Press Enter to start!"); 
 	scoreText.setString("Score = 0");
-
-	// Change the default size to a custom
-	messageText.setCharacterSize(75);
+	// Make it really big 
+	messageText.setCharacterSize(75); 
 	scoreText.setCharacterSize(100);
-
-	// Choose a color
-	messageText.setFillColor(Color::White);
+	// Choose a color 
+	messageText.setFillColor(Color::White); 
 	scoreText.setFillColor(Color::White);
-
-	// Position the text
+	// Position the text 
 	FloatRect textRect = messageText.getLocalBounds();
 	messageText.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
 	messageText.setPosition(1920 / 2.0f, 1080 / 2.0f);
 	scoreText.setPosition(20, 20);
 
-	//Set the font to our message
 	//while the window is open it will execute all the code inside.
 	while (window.isOpen())
 	{
@@ -128,36 +123,42 @@ int main()
 			window.close();
 		}
 
-		//Start the game
-		if (Keyboard::isKeyPressed(Keyboard::Return)) {
+		//start the game
+		if (Keyboard::isKeyPressed(Keyboard::Return))
+		{
 			paused = false;
-
-			//Reset the time and score
+			// Reset the time and the score 
 			score = 0;
 			timeRemaining = 5;
 		}
+		
+		if (!paused)
+		{
 
-		if (!paused) {
 			//Measure time
 			Time dt = clock.restart();
-			//Subtract from amount of time remaining
+
+			// Subtract from the amount of time remaining   
 			timeRemaining -= dt.asSeconds();
-			// Size up the time bar
-			timeBar.setSize(Vector2f(timeBarWidthPerSecond * timeRemaining, timeBarHeight));
-			
-			if (timeRemaining <= 0.0f) {
-				
-				//Pause the game
+			// size up the time bar   
+			timeBar.setSize(Vector2f(timeBarWidthPerSecond *
+				timeRemaining, timeBarHeight));
+
+			if (timeRemaining <= 0.0f) {  
+				// Pause the game  
 				paused = true;
-
-				//Change the message shown to the player
+				// Change the message shown to the player  
 				messageText.setString("Out of time!!");
+				//Reposition the text based on its new size 
+				FloatRect textRect = messageText.getLocalBounds(); 
+				messageText.setOrigin(textRect.left + 
+					textRect.width / 2.0f,
+					textRect.top + 
+					textRect.height / 2.0f);
 
-				//Reposition the text based on its new size
-				FloatRect textRect = messageText.getLocalBounds();
-				messageText.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
 				messageText.setPosition(1920 / 2.0f, 1080 / 2.0f);
 			}
+
 			//Setup the bee
 			if (!beeActive)
 			{
@@ -264,8 +265,13 @@ int main()
 				}
 			}
 
+			// Update the score text   
+			std::stringstream ss;   
+			ss << "Score = " << score;   
+			scoreText.setString(ss.str());
+		}	//End if paused
 
-		}
+
 
 		//Clears the screen and draws the content in the same frame.
 		window.clear();
@@ -277,13 +283,16 @@ int main()
 
 		window.draw(spriteTree);
 		window.draw(spriteBee);
-		//Draw the score
+
+
+		// Draw the score 
 		window.draw(scoreText);
-		//Draw the time bar
+
+		// Draw the timebar 
 		window.draw(timeBar);
 
-		if (paused) {
-			//Draw our message
+		if (paused) { 
+			// Draw our message  
 			window.draw(messageText);
 		}
 		window.display();
@@ -291,3 +300,4 @@ int main()
 	}
 	return 0;
 }
+
