@@ -305,7 +305,7 @@ int main()
 	
 	// Update the score text
 	std::stringstream ss;
-	ss << "Score = " << score;
+	ss << "Score = " << playerScore;
 	scoreText.setString(ss.str());
 	return 0;
 }
