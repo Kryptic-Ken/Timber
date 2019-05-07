@@ -145,7 +145,7 @@ int main()
 			paused = false;
 
 			// Reset the time and the score
-			score = 0;
+			playerScore = 0;
 			timeRemaining = 5;
 		}
 		
