@@ -2,153 +2,7 @@
 #include "HUD.h"
 #include <sstream>
 
-const unsigned int MESSAGE_TEXT_SIZE = 75;
-const unsigned int SCORE_TEXT_SIZE = 100;
-const float TEXT_PADDING_TOP_LEFT = 20.0f;
 
-
-class HUD: public Object{
-private:
-    Text messageText;
-    Text scoreText;
-    Font font;
-    
-    RectangleShape scoreTextBackground;
-
-    RectangleShape timeBar;
-    float timeBarStartWidth;
-    float timeBarHeight;
-    float timeBarWidthPerSecond;
-
-    int oldScore;           // Previous value of the players score
-    bool* paused;        // Only for reading purposes
-    int* playerScore;            // Only for reading purposes
-    float* playerTimeRemaining;  // Only for reading purposes
-    bool* PlayerDied;    // Only for reading purposes
-    }
-    
-    
-    
-    
-HUD::HUD(bool* paused, int* playerScore, float* playerTimeRemaining, bool* PlayerDied):
-Object(),
-paused(paused),
-playerScore(playerScore),
-playerTimeRemaining(playerTimeRemaining),
-PlayerDied(PlayerDied),
-timeBarWidthPerSecond(60)
-{
-    //Check the file for the correct font
-    //Could not load file for the correct font of displayed text
-    font.loadFromFile();
-
-    // Set the font to our message
-    messageText.setFont(font);
-    scoreText.setFont(font);
-
-    // Assign the actual message
-    messageText.setString("Press Enter to start!");
-    scoreText.setString("Score = 0");
-
-    // Change the default size to a custom
-    messageText.setCharacterSize(MESSAGE_TEXT_SIZE);
-    scoreText.setCharacterSize(SCORE_TEXT_SIZE);
-
-    // Choose a color
-    messageText.setFillColor(Color::Black);
-    scoreText.setFillColor(Color::Black);
-
-    // Position the text
-    FloatRect textRect = messageText.getLocalBounds();
-    messageText.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
-    messageText.setPosition(WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f);
-    scoreText.setPosition(TEXT_PADDING_TOP_LEFT, TEXT_PADDING_TOP_LEFT);
-
-    // Time bar
-    timeBarStartWidth = 400;
-    timeBarHeight = 80;
-
-    if (playerTimeRemaining)
-        timeBarWidthPerSecond = timeBarStartWidth / (*playerTimeRemaining);
-
-    timeBar.setSize(Vector2f(timeBarStartWidth, timeBarHeight));
-    timeBar.setFillColor(Color::Red);
-    timeBar.setPosition((WINDOW_WIDTH / 2) - timeBarStartWidth / 2, 980);
-
-    scoreTextBackground.setFillColor(sf::Color(0, 0, 0, 150));
-    scoreTextBackground.setSize(Vector2f(570, 105));
-    scoreTextBackground.setPosition(0, 30);
-}
-
-
-void HUD::setMessageText(std::string text)
-{
-    // Change the message shown to the player
-    messageText.setString(text);
-
-    // Positions the text based on its size 
-    FloatRect textRect = messageText.getLocalBounds();
-    messageText.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
-    messageText.setPosition(WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f);
-}
-
-
-void HUD::updatePlayerScore(int score)
-{
-    std::stringstream ss;
-    ss << "Score = " << score;
-    scoreText.setString(ss.str());
-
-    FloatRect scoreTextSize = scoreText.getLocalBounds();
-    scoreTextBackground.setFillColor(sf::Color(0, 0, 0, 150));
-    scoreTextBackground.setSize(Vector2f(scoreTextSize.width + 50, 105));
-    scoreTextBackground.setPosition(0, 30);
-}
-
-
-void HUD::updatePlayerTimeRemaining(float timeRemaining)
-{
-    // Size up the time bar
-    timeBar.setSize(Vector2f(timeBarWidthPerSecond * timeRemaining, timeBarHeight));
-}
-
-
-void HUD::update(RenderWindow& window, Time timedelta)
-{
-    updatePlayerTimeRemaining(*playerTimeRemaining);
-
-    if (paused && (*paused))
-    {
-        if (playerTimeRemaining && (*playerTimeRemaining <= 0.0f))
-            setMessageText("Out of time!!");
-
-        if (PlayerDied && (*PlayerDied))
-            setMessageText("SQUASHED!!");
-    }
-
-    if (playerScore && (*playerScore) != oldScore)
-    {
-        oldScore = *playerScore;
-        updatePlayerScore(oldScore);
-    }
-}
-
-void HUD::draw(RenderWindow& window)
-{
-    // Draw the timebar
-    window.draw(timeBar);
-
-    // Display messages on the screen
-    window.draw(scoreTextBackground);
-    window.draw(scoreText);
-    if (paused && (*paused)
-    {
-        window.draw(messageText);
-    }
-        
-    //Displays what has been drawn
-    window.display();
-}
 
 using namespace sf;
 
@@ -218,29 +72,59 @@ int main()
 	//Variables to control time itself
 	Clock clock;
 	
+	// Time bar
+	RectangleShape timeBar;
+	float timeBarStartWidth = 400;
+	float timeBarHeight = 80;
+
+	timeBar.setSize(Vector2f(timeBarStartWidth, timeBarHeight));
+	timeBar.setFillColor(Color::Red);
+	timeBar.setPosition((1920 / 2) - timeBarStartWidth / 2, 980);
+
+	Time gameTimeTotal;
+	float timeRemaining = 6.0f;
+	float timeBarWidthPerSecond = timeBarStartWidth / timeRemaining;
+
+	// Track whether the game is running
 	bool paused = true;
+
+	// Draw some text
 	int playerScore = 0;
-	float playerTimeRemaining = 6.0f;
-	bool PlayerDied = false;
-	
-	HUD hud(paused, playerScore, playerTimeRemaining, PlayerDied);
 
-	
-	
-	
-	if (!paused)
-        {
-            // Time elapsed after previous frame
-            Time timedelta = clock.restart();
+	Text messageText;
+	Text scoreText;
 
-            // Subtract from the amount of time remaining
-            playerTimeRemaining -= timedelta.asSeconds();
+	// We need to choose a font
+	Font font;
+	font.loadFromFile("fonts/KOMIKAP_.ttf");
 
-            if (timeRemaining <= 0.0f)
-            {
-                // Pause the game
-                paused = true;
-            }
+	// Set the font to our message
+	messageText.setFont(font);
+	scoreText.setFont(font);
+
+	// Assign the actual message
+	messageText.setString("Press Enter to start!");
+	scoreText.setString("Score = 0");
+
+	// Make it really big
+	messageText.setCharacterSize(75);
+	scoreText.setCharacterSize(100);
+
+	// Choose a color
+	messageText.setFillColor(Color::Black);
+	scoreText.setFillColor(Color::Black);
+	
+	
+	//Positions the text
+	
+	auto textRect = messageText.getLocalBounds();
+
+	messageText.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
+
+	messageText.setPosition(1920 / 2.0f, 1080 / 2.0f);
+
+	scoreText.setPosition(20, 20);
+
 	    
 	    
 	    
@@ -255,6 +139,43 @@ int main()
 		{
 			window.close();
 		}
+		
+		if (Keyboard::isKeyPressed(Keyboard::Return))
+		{
+			paused = false;
+
+			// Reset the time and the score
+			score = 0;
+			timeRemaining = 5;
+		}
+		
+			if (!paused)
+		{
+			// Measure time
+			Time dt = clock.restart();
+
+			// Subtract from the amount of time remaining
+			timeRemaining -= dt.asSeconds();
+			// size up the time bar
+			timeBar.setSize(Vector2f(timeBarWidthPerSecond * timeRemaining, timeBarHeight));
+
+			if (timeRemaining <= 0.0f)
+			{
+				// Puase the game
+				paused = true;
+
+				// Change the message shown to the player
+				messageText.setString("Out of time!!");
+
+				// Reposition the text based on its new size
+				auto textRect = messageText.getLocalBounds();
+				messageText.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
+
+				messageText.setPosition(1920 / 2.0f, 1080 / 2.0f);
+			}
+	
+	
+	
 		
 
 		//Measure time
@@ -381,5 +302,10 @@ int main()
 		window.display();
 
 	}
+	
+	// Update the score text
+	std::stringstream ss;
+	ss << "Score = " << score;
+	scoreText.setString(ss.str());
 	return 0;
 }
